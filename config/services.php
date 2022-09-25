@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'npi' => [
+        'url' => env('NPI_URL'),
+        'version' => '2.1',
+    ],
+
 ];
