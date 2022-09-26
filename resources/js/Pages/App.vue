@@ -1,6 +1,6 @@
 <template>
     <div>
-        <form class="mx-auto max-w-lg space-y-8 divide-y divide-gray-200" @submit.prevent="submit">
+        <form class="mx-auto max-w-lg space-y-8 divide-y divide-gray-200" @submit.prevent="search">
             <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                 <div class="space-y-6 pt-8 sm:space-y-5 sm:pt-10">
                     <div>
@@ -38,6 +38,10 @@
                 </div>
             </div>
 
+            <div v-if="npiError" class="pt-5">
+                <span class="rounded-full bg-red-200 text-red-900 px-4 py-2" v-text="npiError" />
+            </div>
+
             <div class="pt-5">
                 <div class="flex justify-end">
                     <button type="submit" class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Search NPI</button>
@@ -45,7 +49,7 @@
             </div>
         </form>
 
-        <modal :open="modalOpen" :results="results" @close="modalOpen = false" />
+        <modal :open="modalOpen" :form="form" :npi="npi" @close="modalOpen = false" @skip="paginate" />
     </div>
 </template>
 
@@ -62,36 +66,50 @@ export default {
     data() {
         return {
             modalOpen: false,
-            results: [],
             form: {
-                // first_name: '',
-                first_name: 'Corey',
+                first_name: '',
                 last_name: '',
-                // last_name: 'Coburn',
                 number: '',
-                // number: '1134777113',
                 taxonomy_description: '',
-                // taxonomy_description: 'asdf',
                 city: '',
-                // city: 'Santa Rosa',
                 state: '',
-                // state: 'CA',
                 zip: '',
-                // zip: '95401',
+                skip: 0,
             },
+            npi: {},
+            npiError: '',
         };
     },
 
     methods: {
+        search() {
+            this.form.skip = 0;
+            this.submit();
+        },
         async submit() {
-            const response = await fetch('/api/npi', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(this.form),
-            });
+            try {
+                this.npiError = '';
+                const response = await fetch('/api/npi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.form),
+                });
+                this.npi = await response.json();
 
-            this.results = await response.json();
-            this.modalOpen = true;
+                if (response.status === 422) {
+                    throw Error(this.npi.message);
+                }
+
+                this.modalOpen = true;
+            } catch (error) {
+                this.modalOpen = false;
+                this.npiError = error;
+                console.error(error);
+            }
+        },
+        paginate(count) {
+            this.form.skip = count;
+            this.submit();
         },
     },
 }
