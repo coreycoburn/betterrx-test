@@ -11,7 +11,8 @@ class NPIController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $terms = $request->all();
+        $npi = NPI::get($terms);
 
-        return response()->json(NPI::get($terms));
+        return response()->json($npi, $npi['code']);
     }
 }

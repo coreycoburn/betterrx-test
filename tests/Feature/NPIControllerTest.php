@@ -15,10 +15,23 @@ class NPIControllerTest extends TestCase
 
         $this->json('POST', route('api.npi'), [
             'first_name' => 'Corey',
-        ])->assertJson(static fn (AssertableJson $json) =>
-            $json
-                ->count(2)
-                ->has('0.addresses')
-        );
+        ])
+            ->assertSuccessful()
+            ->assertJson(static fn (AssertableJson $json) =>
+                $json
+                    ->has('result_count')
+                    ->has('results')
+                    ->has('code')
+                    ->has('paginate')
+                    ->has('max_results')
+            );
+    }
+
+    /** @test */
+    public function it_returns_a_422_if_no_search_terms_were_passed(): void
+    {
+        NPI::fake();
+
+        $this->json('POST', route('api.npi'))->assertUnprocessable();
     }
 }
