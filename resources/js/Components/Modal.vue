@@ -13,8 +13,6 @@
                                 <div class="mt-3 text-center sm:mt-5">
                                     <dialog-title as="h3" class="text-lg font-medium leading-6 text-gray-900">NPI Registry Results</dialog-title>
                                     <div class="text-right">Total Showing: {{ npi.result_count }}</div>
-                                    <div>Skipping: {{ form.skip }}</div>
-                                    <div>Max: {{ npi.max_results }}</div>
                                     <div class="mt-2">
                                         <div v-if="npi.result_count === 0">
                                             <p class="text-sm text-gray-500">There are no results</p>
