@@ -32,8 +32,10 @@ return [
     ],
 
     'npi' => [
-        'url' => env('NPI_URL'),
+        'url' => env('NPI_URL', 'https://npiregistry.cms.hhs.gov/api/'),
         'version' => '2.1',
+        'paginate' => env('NPI_PAGINATE', 10),
+        'max_results' => env('NPI_MAX_RESULTS', 1200),
     ],
 
 ];
